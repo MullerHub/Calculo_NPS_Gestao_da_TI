@@ -4,17 +4,21 @@
 #include <stdbool.h>
 
 #define MAX_CLIENTS 100
-int maxSurveys;
 
-// Prototipos
-bool fechouNegocio(int *return_bussiness, int *total_interacoes, int *up_selling_count, int *cross_selling_count, int *churn_count, int *num_de_clientes_churn);
-void perguntas_e_calculos(const char *question, int *count);
-void calcularMetricas(int return_bussiness, int total_interacoes, int up_selling_count, int cross_selling_count, int churn_count, int numero_de_clientes);
-
+// Definir a estrutura Survey antes de usá-la
 typedef struct Survey
 {
     int value;
 } Survey;
+
+// Protótipos das funções
+bool fechouNegocio(int *return_bussiness, int *total_interacoes, int *up_selling_count, int *cross_selling_count, int *churn_count, int *num_de_clientes_churn);
+void perguntas_e_calculos(const char *question, int *count);
+void calcularMetricas(int return_bussiness, int total_interacoes, int up_selling_count, int cross_selling_count, int churn_count, int numero_de_clientes);
+void calcularTaxaRetornoChurn(int fecharam_negocio, int retornaram, int churned);
+
+// Declarar a função perguntas_e_calculos_NPS antes de usá-la
+void perguntas_e_calculos_NPS(Survey surveys[], int maxSurveys);
 
 typedef struct NpsResult
 {
@@ -25,8 +29,7 @@ typedef struct NpsResult
     double nps;
 } NpsResult;
 
-NpsResult calculateNps(Survey surveys[], int size)
-;
+NpsResult calculateNps(Survey surveys[], int size);
 
 int main()
 {
@@ -36,12 +39,8 @@ int main()
     int return_bussiness = 0;
     int churn_count = 0;
     int num_de_clientes_churn = 0;
+    int maxSurveys;
 
-    // Perguntas sobre marketing, cross, up-selling e taxa de retorno de clientes/churn
-    fechouNegocio(&return_bussiness, &total_interacoes, &up_selling_count, &cross_selling_count, &churn_count, &num_de_clientes_churn);
-    calcularMetricas(return_bussiness, total_interacoes, up_selling_count, cross_selling_count, churn_count, maxSurveys);
-
-    // NPS captura, calculo e porcentagem
     printf("Informe o numero maximo de respostas da pesquisa: ");
     scanf("%d", &maxSurveys);
 
@@ -49,46 +48,56 @@ int main()
 
     if (surveys == NULL)
     {
-        printf("Erro ao alocar memoria para as respostas da pesquisa.\n");
+        printf("Erro ao alocar memória para as respostas da pesquisa NPS.\n");
         return 1;
     }
 
-    int size = 0;
-    int value;
-    printf("Informe as respostas da pesquisa (-1 para encerrar):\n");
+    // Perguntas sobre marketing, cross-selling, e taxa de retorno de clientes/churn
+    fechouNegocio(&return_bussiness, &total_interacoes, &up_selling_count, &cross_selling_count, &churn_count, &num_de_clientes_churn);
 
-    while (1)
-    {
-        printf("Resposta %d: ", size + 1);
-        scanf("%d", &value);
+    // Perguntas e cálculos NPS
+    printf("Responda a pesquisa NPS:\n");
+    perguntas_e_calculos_NPS(surveys, maxSurveys);
 
-        if (value == -1)
-        {
-            break;
-        }
-        if (size < maxSurveys)
-        {
-            surveys[size].value = value;
-            size++;
-        }
-        else
-        {
-            printf("Limite maximo de respostas atingido.\n");
-            break;
-        }
-    }
+    calcularMetricas(return_bussiness, total_interacoes, up_selling_count, cross_selling_count, churn_count, maxSurveys);
 
-    NpsResult result = calculateNps(surveys, size);
-
+    // calculos finais sobre o NPS armazenado dos clientes / usuarios
+    NpsResult result = calculateNps(surveys, maxSurveys);
     printf("Detratores: %d\n", result.detractors);
     printf("Promotores: %d\n", result.promoters);
     printf("Passivos/neutros: %d\n", result.passive);
     printf("Total de respostas: %d\n", result.allAnswers);
     printf("NPS: %.2lf\n", result.nps);
 
+    // Libere a memória alocada
     free(surveys);
 
     return 0;
+}
+
+void perguntas_e_calculos_NPS(Survey surveys[], int maxSurveys)
+{
+    for (int i = 0; i < maxSurveys; i++)
+    {
+        int value;
+        printf("Resposta %d, Qual nota voce da para nossa empresa? (de 1 / 10)", i + 1);
+        scanf("%d", &value);
+
+        if (value == -1)
+        {
+            break;
+        }
+
+        if (i < maxSurveys)
+        {
+            surveys[i].value = value;
+        }
+        else
+        {
+            printf("Limite máximo de respostas atingido.\n");
+            break;
+        }
+    }
 }
 
 NpsResult calculateNps(Survey surveys[], int size)
@@ -120,6 +129,14 @@ NpsResult calculateNps(Survey surveys[], int size)
     return result;
 }
 
+void calcularTaxaRetornoChurn(int fecharam_negocio, int retornaram, int churned)
+{
+    double taxa_retorno = (double)retornaram / fecharam_negocio * 100;
+    double taxa_churn = (double)churned / fecharam_negocio * 100;
+
+    printf("Dos que fecharam algum negocio, %.2lf%% retornaram a fazer negocio em 3 meses.\n", taxa_retorno);
+    printf("Dos que fecharam algum negocio, %.2lf%% entraram em churn.\n", taxa_churn);
+}
 
 bool fechouNegocio(int *return_bussiness, int *total_interacoes, int *up_selling_count, int *cross_selling_count, int *churn_count, int *num_de_clientes_churn)
 {
@@ -140,6 +157,13 @@ bool fechouNegocio(int *return_bussiness, int *total_interacoes, int *up_selling
             printf("contagem do return %i\n", *return_bussiness);
 
             (*total_interacoes)++;
+
+            // Chamar a função para calcular a taxa de retorno e churn
+            if (*return_bussiness > 0)
+            {
+                calcularTaxaRetornoChurn(*total_interacoes, *return_bussiness, *num_de_clientes_churn);
+            }
+
             return true;
         }
         else if (FechouNegocio == 'N' || FechouNegocio == 'n')
@@ -149,6 +173,13 @@ bool fechouNegocio(int *return_bussiness, int *total_interacoes, int *up_selling
             char feedback[100];
             scanf(" %99s", feedback);
             (*num_de_clientes_churn)++;
+
+            // Chamar a função para calcular a taxa de retorno e churn
+            if (*return_bussiness > 0)
+            {
+                calcularTaxaRetornoChurn(*total_interacoes, *return_bussiness, *num_de_clientes_churn);
+            }
+
             return false;
         }
         else
