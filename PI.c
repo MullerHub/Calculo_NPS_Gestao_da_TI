@@ -12,12 +12,10 @@ typedef struct Survey
 } Survey;
 
 // Protótipos das funções
-bool fechouNegocio(int *return_bussiness, int *total_interacoes, int *up_selling_count, int *cross_selling_count, int *churn_count, int *num_de_clientes_churn);
-void perguntas_e_calculos(const char *question, int *count);
+bool fechouNegocio(int *return_bussiness, int *total_interacoes, int *up_selling_count, int *cross_selling_count, int *churn_count, int *num_de_clientes_churn, int maxSurveys);
+void perguntas_e_calculos(const char *question, int *count, int maxSurveys);
 void calcularMetricas(int return_bussiness, int total_interacoes, int up_selling_count, int cross_selling_count, int churn_count, int numero_de_clientes);
 void calcularTaxaRetornoChurn(int fecharam_negocio, int retornaram, int churned);
-
-// Declarar a função perguntas_e_calculos_NPS antes de usá-la
 void perguntas_e_calculos_NPS(Survey surveys[], int maxSurveys);
 
 typedef struct NpsResult
@@ -53,7 +51,7 @@ int main()
     }
 
     // Perguntas sobre marketing, cross-selling, e taxa de retorno de clientes/churn
-    fechouNegocio(&return_bussiness, &total_interacoes, &up_selling_count, &cross_selling_count, &churn_count, &num_de_clientes_churn);
+    fechouNegocio(&return_bussiness, &total_interacoes, &up_selling_count, &cross_selling_count, &churn_count, &num_de_clientes_churn, maxSurveys);
 
     // Perguntas e cálculos NPS
     printf("Responda a pesquisa NPS:\n");
@@ -138,7 +136,7 @@ void calcularTaxaRetornoChurn(int fecharam_negocio, int retornaram, int churned)
     printf("Dos que fecharam algum negocio, %.2lf%% entraram em churn.\n", taxa_churn);
 }
 
-bool fechouNegocio(int *return_bussiness, int *total_interacoes, int *up_selling_count, int *cross_selling_count, int *churn_count, int *num_de_clientes_churn)
+bool fechouNegocio(int *return_bussiness, int *total_interacoes, int *up_selling_count, int *cross_selling_count, int *churn_count, int *num_de_clientes_churn, int maxSurveys)
 {
     char FechouNegocio;
     do
@@ -148,9 +146,9 @@ bool fechouNegocio(int *return_bussiness, int *total_interacoes, int *up_selling
 
         if (FechouNegocio == 's' || FechouNegocio == 'S')
         {
-            perguntas_e_calculos("Voce fez up-selling???", up_selling_count);
-            perguntas_e_calculos("Voce fez cross-selling???", cross_selling_count);
-            perguntas_e_calculos("Voce voltaria a fazer negocios com a gente??", return_bussiness);
+            perguntas_e_calculos("Voce fez up-selling???", up_selling_count, maxSurveys);
+            perguntas_e_calculos("Voce fez cross-selling???", cross_selling_count, maxSurveys);
+            perguntas_e_calculos("Voce voltaria a fazer negocios com a gente??", return_bussiness, maxSurveys);
 
             printf("contagem do up-selling %i\n", *up_selling_count);
             printf("contagem do cross %i\n", *cross_selling_count);
@@ -190,7 +188,7 @@ bool fechouNegocio(int *return_bussiness, int *total_interacoes, int *up_selling
     return false;
 }
 
-void perguntas_e_calculos(const char *question, int *count)
+void perguntas_e_calculos(const char *question, int *count, int maxSurveys)
 {
     char resposta;
     printf("%s (S/N): ", question);
@@ -216,6 +214,8 @@ void calcularMetricas(int return_bussiness, int total_interacoes, int up_selling
     printf("Porcentagem de clientes que retornaram: %.2f%%\n", porcentagem_clientes_retornaram);
     printf("Porcentagem de clientes que entraram em churn: %.2f%%\n", porcentagem_clientes_churned);
 }
+
+
 
 /*
 
