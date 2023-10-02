@@ -5,6 +5,90 @@
 
 #define MAX_CLIENTS 100
 
+//
+typedef struct Survey {
+    int value;
+} Survey;
+
+typedef struct NpsResult {
+    int detractors;
+    int promoters;
+    int passive;
+    int allAnswers;
+    double nps;
+} NpsResult;
+
+NpsResult calculateNps(Survey surveys[], int size) {
+    NpsResult result;
+    result.detractors = 0;
+    result.promoters = 0;
+    result.passive = 0;
+    result.allAnswers = size;
+
+    for (int i = 0; i < size; i++) {
+        int value = surveys[i].value;
+        if (value >= 0 && value <= 6) {
+            result.detractors++;
+        } else if (value >= 9 && value <= 10) {
+            result.promoters++;
+        } else if (value >= 7 && value <= 8) {
+            result.passive++;
+        }
+    }
+
+    result.nps = ((double)result.promoters - result.detractors) / result.allAnswers * 100;
+    return result;
+}
+
+int main()
+{
+
+     int maxSurveys;
+    printf("Informe o número máximo de respostas da pesquisa: ");
+    scanf("%d", &maxSurveys);
+
+    Survey *surveys = (Survey *)malloc(maxSurveys * sizeof(Survey));
+
+    if (surveys == NULL) {
+        printf("Erro ao alocar memória para as respostas da pesquisa.\n");
+        return 1;
+    }
+
+    int size = 0;
+    int value;
+
+    printf("Informe as respostas da pesquisa (-1 para encerrar):\n");
+
+    while (1) {
+        printf("Resposta %d: ", size + 1);
+        scanf("%d", &value);
+
+        if (value == -1) {
+            break;
+        }
+
+        if (size < maxSurveys) {
+            surveys[size].value = value;
+            size++;
+        } else {
+            printf("Limite máximo de respostas atingido.\n");
+            break;
+        }
+    }
+
+    NpsResult result = calculateNps(surveys, size);
+
+    printf("Detractors: %d\n", result.detractors);
+    printf("Promoters: %d\n", result.promoters);
+    printf("Passive: %d\n", result.passive);
+    printf("All Answers: %d\n", result.allAnswers);
+    printf("NPS: %.2lf\n", result.nps);
+
+    free(surveys);
+}
+
+/* 
+
 // Protótipos de funções
 bool fechouNegocio(int *return_bussiness, int *total_interacoes, int *up_selling_count, int *cross_selling_count, int *churn_count, char feedbacks[][100], int *num_de_clientes_churn);
 double calcularNPS(int notas[], int tamanho);
@@ -18,6 +102,7 @@ int main(int argc, char *argv[])
         printf("Uso: %s <quantidade_de_clientes>\n", argv[0]);
         return 1;
     }
+
 
     int total_interacoes = 0;
     int up_selling_count = 0;
@@ -93,8 +178,6 @@ double calcularNPS(int notas[], int tamanho)
     int detratores = 0;
     int neutros = 0;
 
-    printf("Avalie nossa empresa (0 a 10) para %d clientes:\n", tamanho);
-
     for (int i = 0; i < tamanho; i++)
     {
         int nota = notas[i];
@@ -148,3 +231,9 @@ void calcularMetricas(int return_bussiness, int total_interacoes, int up_selling
     double nps = calcularNPS(notas_cliente, total_interacoes);
     printf("Net Promoter Score (NPS): %.2f\n", nps);
 }
+
+
+
+
+
+ */
