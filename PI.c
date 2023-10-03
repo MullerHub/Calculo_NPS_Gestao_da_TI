@@ -166,7 +166,7 @@ bool fechouNegocio(int *return_bussiness, int *total_interacoes, int *up_selling
 
             return true;
         }
-        else if (FechouNegocio == 'N' || FechouNegocio == 'n')
+        else if (FechouNegocio == 'N' || FechouNegocio == 'n') //REVISAR OS CALCULOS DO CHURN QUE NÃO ATUALIZAM AQUI, CHURN tem que aumentar e return de clientes diminuir a porcentagem
         {
             (*num_de_clientes_churn)++;
 
