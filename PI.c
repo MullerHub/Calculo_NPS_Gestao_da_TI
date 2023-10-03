@@ -17,9 +17,9 @@ bool fechouNegocio(int *return_bussiness, int *total_interacoes, int *up_selling
 void perguntas_e_calculos(const char *question, int *count, int maxSurveys);
 void calcularMetricas(int return_bussiness, int total_interacoes, int up_selling_count, int cross_selling_count, int churn_count, int maxSurveys);
 void calcularTaxaRetornoChurn(int fecharam_negocio, int retornaram, int churned);
-// calcularTaxaRetornoChurn(*total_interacoes, *return_bussiness, *num_de_clientes_churn);
 void perguntas_e_calculos_NPS(Survey surveys[], int maxSurveys);
 int maxSurveys;
+bool terminar_aplicacao = true;
 
 typedef struct NpsResult
 {
@@ -35,11 +35,11 @@ NpsResult calculateNps(Survey surveys[], int size);
 int main()
 {
     int total_interacoes = 0;
-    int up_selling_count = 0;    // contador de up-selling
-    int cross_selling_count = 0; // contador de cross-selling
-    int return_bussiness = 0;    // voltariam a fazer negocios com a gente
-    int churn_count = 0;
-    int num_de_clientes_churn = 0;
+    int up_selling_count = 0;      // contador de up-selling
+    int cross_selling_count = 0;   // contador de cross-selling
+    int return_bussiness = 0;      // voltariam a fazer negocios com a gente
+    int churn_count = 0;           // desistiram de fazer negocios com a gente
+    int num_de_clientes_churn = 0; // variavel para o calculo de porcentagem do churn
 
     printf("Informe o numero maximo de respostas da pesquisa: ");
     scanf("%d", &maxSurveys);
@@ -66,7 +66,7 @@ int main()
     calcularMetricas(return_bussiness, total_interacoes, up_selling_count, cross_selling_count, churn_count, maxSurveys);
 
     // Chamar a função para calcular a taxa de retorno e churn
-    calcularTaxaRetornoChurn(total_interacoes, return_bussiness, num_de_clientes_churn); // preciso que seja calculado igual caso o input do fechou_negocio seja nao
+    calcularTaxaRetornoChurn(total_interacoes, return_bussiness, num_de_clientes_churn);
 
     // calculos finais sobre o NPS armazenado dos clientes / usuarios
     NpsResult result = calculateNps(surveys, maxSurveys);
@@ -77,6 +77,8 @@ int main()
     printf("NPS: %.2lf\n", result.nps);
 
     // Libere a memória alocada
+    printf("terminar a aplicacao: (sim)");
+    scanf("%d", terminar_aplicacao);
     free(surveys);
 
     return 0;
@@ -87,7 +89,7 @@ void perguntas_e_calculos_NPS(Survey surveys[], int maxSurveys)
     for (int i = 0; i < maxSurveys; i++)
     {
         int value;
-        printf("Resposta %d, Qual nota voce da para nossa empresa? (de 1 / 10)", i + 1);
+        printf("Cliente %d, de 1 ao 10, Qual nota voce da para nossa empresa?", i + 1);
         scanf("%d", &value);
 
         if (value == -1)
@@ -143,9 +145,6 @@ void calcularTaxaRetornoChurn(int fecharam_negocio, int retornaram, int churned)
 
     printf("Dos que fecharam algum negocio, %.2lf%% retornaram a fazer negocio em 3 meses.\n", taxa_retorno);
     printf("Dos que fecharam algum negocio, %.2lf%% entraram em churn.\n", taxa_churn);
-
-    // Aumentar o churn_count com base no número de clientes que entraram em churn
-    churned += fecharam_negocio - retornaram;
 };
 
 bool fechouNegocio(int *return_bussiness, int *total_interacoes, int *up_selling_count, int *cross_selling_count, int *churn_count, int *num_de_clientes_churn, int maxSurveys)
@@ -153,7 +152,7 @@ bool fechouNegocio(int *return_bussiness, int *total_interacoes, int *up_selling
     char FechouNegocio;
     do
     {
-        printf("Voce fechou negocio com a gente devido ao marketing?? (S/n): \n");
+        printf("Voce fechou negocio com a gente devido ao marketing?? ");
         scanf(" %c", &FechouNegocio);
         FechouNegocio = tolower(FechouNegocio);
 
@@ -175,10 +174,8 @@ bool fechouNegocio(int *return_bussiness, int *total_interacoes, int *up_selling
         {
             (*num_de_clientes_churn)++;
 
-            // Chamar a função para calcular a taxa de retorno e churn, CALCULOS DO CHURN ESTÃO CORRETOS, apenas precisam caso chegue aqui, aumentar o numero de cllientes que entraram em churn
-
             // Chamar a função para calcular a taxa de retorno e churn
-            calcularTaxaRetornoChurn(*total_interacoes, *return_bussiness, *churn_count); // preciso que essa função entre aqui e faça os calculos dela
+            calcularTaxaRetornoChurn(*total_interacoes, *return_bussiness, *churn_count); // calculos aqui estão errados, mas no final corrige (ficou complexo que não consegui corrigir esse bug a tempo, provavelmente erro com os ponteiros usados)
 
             return false;
         }
