@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <ctype.h>
 
 #define MAX_CLIENTS 100
 
@@ -65,7 +66,7 @@ int main()
     calcularMetricas(return_bussiness, total_interacoes, up_selling_count, cross_selling_count, churn_count, maxSurveys);
 
     // Chamar a função para calcular a taxa de retorno e churn
-    calcularTaxaRetornoChurn(total_interacoes, return_bussiness, num_de_clientes_churn);
+    calcularTaxaRetornoChurn(total_interacoes, return_bussiness, num_de_clientes_churn); // preciso que seja calculado igual caso o input do fechou_negocio seja nao
 
     // calculos finais sobre o NPS armazenado dos clientes / usuarios
     NpsResult result = calculateNps(surveys, maxSurveys);
@@ -142,6 +143,9 @@ void calcularTaxaRetornoChurn(int fecharam_negocio, int retornaram, int churned)
 
     printf("Dos que fecharam algum negocio, %.2lf%% retornaram a fazer negocio em 3 meses.\n", taxa_retorno);
     printf("Dos que fecharam algum negocio, %.2lf%% entraram em churn.\n", taxa_churn);
+
+    // Aumentar o churn_count com base no número de clientes que entraram em churn
+    churned += fecharam_negocio - retornaram;
 };
 
 bool fechouNegocio(int *return_bussiness, int *total_interacoes, int *up_selling_count, int *cross_selling_count, int *churn_count, int *num_de_clientes_churn, int maxSurveys)
@@ -151,8 +155,9 @@ bool fechouNegocio(int *return_bussiness, int *total_interacoes, int *up_selling
     {
         printf("Voce fechou negocio com a gente devido ao marketing?? (S/n): \n");
         scanf(" %c", &FechouNegocio);
+        FechouNegocio = tolower(FechouNegocio);
 
-        if (FechouNegocio == 's' || FechouNegocio == 'S')
+        if (FechouNegocio == 's')
         {
             perguntas_e_calculos("Voce fez up-selling???", up_selling_count, maxSurveys);
             perguntas_e_calculos("Voce fez cross-selling???", cross_selling_count, maxSurveys);
@@ -166,13 +171,14 @@ bool fechouNegocio(int *return_bussiness, int *total_interacoes, int *up_selling
 
             return true;
         }
-        else if (FechouNegocio == 'N' || FechouNegocio == 'n') //REVISAR OS CALCULOS DO CHURN QUE NÃO ATUALIZAM AQUI, CHURN tem que aumentar e return de clientes diminuir a porcentagem
+        else if (FechouNegocio == 'N' || FechouNegocio == 'n') // REVISAR OS CALCULOS DO CHURN QUE NÃO ATUALIZAM AQUI, CHURN tem que aumentar e return de clientes diminuir a porcentagem
         {
             (*num_de_clientes_churn)++;
 
-            // Chamar a função para calcular a taxa de retorno e churn
+            // Chamar a função para calcular a taxa de retorno e churn, CALCULOS DO CHURN ESTÃO CORRETOS, apenas precisam caso chegue aqui, aumentar o numero de cllientes que entraram em churn
 
-            calcularTaxaRetornoChurn(*total_interacoes, *return_bussiness, *num_de_clientes_churn);
+            // Chamar a função para calcular a taxa de retorno e churn
+            calcularTaxaRetornoChurn(*total_interacoes, *return_bussiness, *churn_count); // preciso que essa função entre aqui e faça os calculos dela
 
             return false;
         }
@@ -189,6 +195,8 @@ void perguntas_e_calculos(const char *question, int *count, int maxSurveys)
     char resposta;
     printf("%s (S/N): ", question);
     scanf(" %c", &resposta);
+
+    resposta = tolower(resposta);
 
     if (resposta == 'S' || resposta == 's')
     {
