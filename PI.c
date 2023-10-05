@@ -213,3 +213,63 @@ void calcularMetricas(int return_bussiness, int total_interacoes, int up_selling
     printf("Porcentagem de up-selling entre os que fecharam negocio: %.2f%%\n", porcentagem_fecharam_up_selling);
     printf("Porcentagem de cross-selling entre os que fecharam negocio: %.2f%%\n", porcentagem_fecharam_cross_selling);
 };
+
+
+
+//
+//
+//
+//
+
+/* Logica antiga, que calcula os clientes de marketing estático e com as porcentagens sobre minha regra de negocios
+
+
+  // Passo 1: Site criado
+  printf("Passo 1: Site criado e fluxo PDCA novo em andamento\n");
+
+  // Passo 2: Solicitar número de clientes
+
+  // Passo 3: Perguntar se o usuário tem conta
+  char temConta;
+  printf("Passo 3: Todo usuarios tem conta? (S para sim, N para nao): (em caso de nao, sera adicionado 30 por cento ao total de clientes da campanha) ");
+  scanf(" %c", &temConta); // Usamos " %c" spara descartar espaços em branco
+
+  // Passo 4: Verificar se o usuário tem conta e criar conta com sucesso
+  if (temConta == 'N' || temConta == 'n')
+  {
+    // O usuário já tem conta, vá para o Passo 5 diretamente
+    printf("Passo 5: O usuario fez o login\n");
+  }
+
+  // Passo 6: O usuário acessa o site e visualiza a home da página
+  printf("Passo 6: O usuario acessou o site e visualizou a home da pagina\n");
+
+  // Passo 7: O cliente selecionou algum produto
+  int porcentagemSucessoProduto = 40;
+  int sucessoProduto = (porcentagemSucessoProduto * numero_clientes) / 100;
+  printf("Passo 7: Clientes que selecionaram algum produto foram %d clientes (40 por cento)\n", sucessoProduto);
+  numero_clientes += sucessoProduto;
+
+  // Passo 8: Simular o frete com uma taxa de sucesso
+  int porcentagemSucessoFrete = 70;
+  int sucessoFrete = (porcentagemSucessoFrete * sucessoProduto) / 100;
+  printf("Passo 8: Clientes que simularam frete foram: %d (70 por cento)\n", sucessoFrete);
+
+  // Passo 9: Usuários que conferiram o carrinho e foram para pagamentos
+  int porcentagemPagamento = 20;
+  int clientesPagamento = (porcentagemPagamento * sucessoFrete) / 100;
+  printf("Passo 9: Usuarios que conferiram o carrinho e foram para pagamentos: %d (20 por cento)\n", clientesPagamento);
+
+  // Passo 10: Recomendar produtos do mesmo nicho para complementar a venda
+  printf("Passo 10: Recomendar produtos do mesmo nicho para complementar a venda (20 por cento adicionais)\n ");
+
+  int porcentagemVendaCasada = 120;
+  int clientesPagamentoCasado = (porcentagemVendaCasada * clientesPagamento) / 100;
+  printf("Passo 11: Usuarios que foram para pagamentos e compraram algo adicional: %d (20 por cento de vendas adicionais aos usuarios normais)\n", clientesPagamentoCasado);
+
+  // Passo 11: Concluído a venda para tantos clientes
+  int porcentagemConclusaoVenda = 50;
+  int clientesConclusaoVenda = (porcentagemConclusaoVenda * clientesPagamentoCasado) / 100;
+  printf("Passo 12: Concluido a venda para tantos clientes: %d\n", clientesConclusaoVenda);
+
+  */
